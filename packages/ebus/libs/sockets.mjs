@@ -23,12 +23,11 @@ export class TelnetProtocol {
         this._queue = [];
         this._buff = []
     }
-    send(name, args = '') {
+    send(message) {
         const defeder = createDefeder();
         this._queue.push({
             defeder,
-            name,
-            message: `${name} ${args}`,
+            message,
         });
         this._sendNext();
         return defeder.promise;
@@ -78,32 +77,30 @@ function createDefeder(){
     return defeder;
 }
 
-function createTransport(socket, isClosing, closeListener) {
-    return {
-        isClosing,
-        write(data) {
-            if(!isClosing()){
-                socket.write(data);
-            }
-        },
-        close() {
-            socket.end();
-            closeListener();
-        },
-    }
-}
-
 export async function createConnection({host, port, protocolFactory}) {
     let status = PENDING;
+
     return new Promise((resolve, reject) => {
         const isClosing = () => status === CLOSING || status === CLOSED;
+        const createTransport = socket => ({
+            isClosing,
+            write(data) {
+                if(!isClosing()){
+                    socket.write(data);
+                }
+            },
+            close() {
+                socket.end();
+                status = CLOSING;
+            },
+        });
         const protocol = protocolFactory();
         const connections = net.connect({ host, port });
         connections.setNoDelay(true);
         status = CONNECTING;
         connections.on('ready', () => {
             status = CONNECTED;
-            const transport = createTransport(connections, isClosing, () => status = CLOSING);
+            const transport = createTransport(connections);
             protocol.connectionMade(transport);
             resolve({
                 transport,

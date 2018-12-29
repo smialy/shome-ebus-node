@@ -6,8 +6,6 @@ export async function start({ ebusPort, ebusHost }) {
         host: ebusHost, 
         port: ebusPort
     });
-    await ebusClient.connect();
-
     const names = [
         'FanSpeed',
         'Flame',
