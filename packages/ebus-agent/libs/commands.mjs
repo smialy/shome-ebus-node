@@ -20,11 +20,21 @@ export async function start({ ebusPort, ebusHost }) {
         'WaterPressure',
         'WP',
     ];
-    // setTimeout(() => transport.close(), 1000);
-    console.log(await ebusClient.readMany(names, 'bai'));
-    console.log(await ebusClient.read('ReturnTemp', 'bai'));
+    let i = 10;
+    const check = async () => {
+        console.log(`Read many: ${names}`);
+        console.log(await ebusClient.readMany(names, 'bai'));
+        console.log('Read one: ReturnTemp');
+        console.log(await ebusClient.read('ReturnTemp', 'bai'));
+        if( i -= 1 ){
+            recheck();
+        } else {
+            ebusClient.close();
+        }
+    }
+    const recheck = () => setTimeout(check, 1000);
+    check();
     // console.log(await ebusClient.readAll('bai'));
-    ebusClient.close();
     
 }
 
