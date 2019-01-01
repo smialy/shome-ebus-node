@@ -10,6 +10,10 @@
   "license": "MIT",
   "dependencies": {
     "@shome/ebus": "^1.0.0",
-    "commander": "^2.19.0"
+    "commander": "^2.19.0",
+    "koa": "^2.6.2",
+    "koa-router": "^7.4.0",
+    "node-cron": "^2.0.3",
+    "systeminformation": "^3.54.0"
   }
 }
