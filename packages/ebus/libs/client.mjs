@@ -108,13 +108,13 @@ function parseValue(str) {
     if (value === 'off' || value === 'no') {
         return false; 
     }
-    if(/^\d+$/.test(value)) {
+    if(/^-?\d+$/.test(value)) {
         const number = parseInt(value, 10);
         if (!Number.isNaN(number)){
             return number;
         }
     }
-    if(/^[\d.]+$/.test(value)) {
+    if(/^-?\d+\.\d+$/.test(value)) {
         const number = parseFloat(value);
         if (!Number.isNaN(number)){
             return number;
