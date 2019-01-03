@@ -158,8 +158,8 @@ async function scraping(metrics, { ebus }) {
     }
     function addMemoryInfo(data) {
         add('ebus_memory_total', data.total);
-        add('ebus_memory_free', data.free);
         add('ebus_memory_used', data.used);
+        add('ebus_memory_available', data.available);
         add('ebus_memory_swap_total', data.swaptotal);
         add('ebus_memory_swap_used', data.swapused);
         add('ebus_memory_swap_free', data.swapfree);
