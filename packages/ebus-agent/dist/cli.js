@@ -1,12 +1,56 @@
-import cron from 'node-cron';
-import koa from 'koa';
-import Router from 'koa-router';
-import si from 'systeminformation';
+'use strict';
 
-import EBusClient from '@shome/ebus-client';
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+var commander = _interopDefault(require('commander'));
+var cron = _interopDefault(require('node-cron'));
+var koa = _interopDefault(require('koa'));
+var Router = _interopDefault(require('koa-router'));
+var si = _interopDefault(require('systeminformation'));
+var EBusClient = _interopDefault(require('@shome/ebus-client'));
 
-export async function start(options) {
+var name = "@shome/ebus-agent";
+var version = "1.0.0";
+var description = "";
+var main = "index.js";
+var scripts = {
+	build: "rollup -c",
+	prepare: "npm run build",
+	test: "echo \"Error: no test specified\" && exit 1"
+};
+var files = [
+	"dist/",
+	"bin/"
+];
+var author = "";
+var license = "MIT";
+var dependencies = {
+	"@shome/ebus-client": "^1.0.0",
+	commander: "^2.19.0",
+	koa: "^2.6.2",
+	"koa-router": "^7.4.0",
+	"node-cron": "^2.0.3",
+	systeminformation: "^3.54.0"
+};
+var devDependencies = {
+	rollup: "^1.0.1",
+	"rollup-plugin-json": "^3.1.0",
+	"rollup-plugin-node-resolve": "^4.0.0"
+};
+var pkg = {
+	name: name,
+	version: version,
+	description: description,
+	main: main,
+	scripts: scripts,
+	files: files,
+	author: author,
+	license: license,
+	dependencies: dependencies,
+	devDependencies: devDependencies
+};
+
+async function start(options) {
     const metrics = {};
     scraping(metrics, options);
     const app = new koa();
@@ -112,7 +156,7 @@ async function scraping(metrics, { ebus }) {
             return value ? 1 : 0;
         }
         return value;
-    }
+    };
     const ebusConfig = [{
         cron: '* * * * *',
         names: [
@@ -169,7 +213,7 @@ async function scraping(metrics, { ebus }) {
         add('ebus_cpu_load_avg', data.avgload);
     }
     function addCpuTemp(data) {
-        add('ebus_cpu_temp', data.main)
+        add('ebus_cpu_temp', data.main);
     }
     function getEBusNames(names) {
         return names.map(name => sensorsByName[name].ebusName);
@@ -177,3 +221,50 @@ async function scraping(metrics, { ebus }) {
     cron.schedule('* * * * *', readInfo);
     readInfo();
 }
+
+function logError(error){
+    if ("string" !== typeof error && error.stack) {
+        error = error.stack;
+    }
+    let message = `\n${error} \n\nNode.js ${process.version}\n`;
+    console.log(message);
+}
+
+function setupExceptionHandler(){
+    process.on("uncaughtException", logError);
+    process.on('unhandledRejection', logError);  // catch all promisess
+}
+
+commander.command('start')
+    .option('--host <host>', 'metric exporter host', 'localhost')
+    .option('--port <port>', 'metric exporter port', 9091)
+    .option('--ebus-host <host>', 'ebus service host', 'localhost')
+    .option('--ebus-port <port>', 'ebus service port', 8888)
+    
+    // .option('--wamp-url <url>', 'wamp server url', 'ws://localhost:8080/ws')
+    // .option('--wamp-realm <realm>', 'wamp server realm', 'shome')
+    .action(options => {
+        const { ebusPort, ebusHost, host, port } = options;
+        start({
+            server: {
+                host,
+                port,
+            },
+            ebus: {
+                host: ebusHost,
+                port: ebusPort,
+            }
+        });
+    });
+
+commander.version(pkg.version)
+    .usage('[cmd]');
+
+
+(function run(){
+    setupExceptionHandler();
+    commander.parse(process.argv);
+    if (process.argv.length == 2) {
+      commander.outputHelp();
+    }
+})();

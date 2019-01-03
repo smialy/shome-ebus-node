@@ -1,22 +1,13 @@
-import { createConnection, TelnetProtocol } from './sockets';
-import { watchFile } from 'fs';
+import { createConnection } from './sockets';
+import { EBusProtocol } from './protocols';
 
 
-class EBusProtocol extends TelnetProtocol {
-    async find(device) {
-        return await this.send(`find -c ${device}`);
-    }
-    async read(name, device) {
-        const value = await this.send(`read -f -c ${device} ${name}`);
-        return parseValue(value.trim());
-    }
-}
 
 function wait(timeout) {
     return new Promise((resolve => setTimeout(resolve, timeout)))
 }
 
-export class EBusClient {
+export default class EBusClient {
     constructor(options) {
         this.options = options;
         this._transport = null;
@@ -100,28 +91,3 @@ export class EBusClient {
 
 }
 
-function parseValue(str) {
-    const value = str.split(';')[0];
-    if (value === 'on' || value === 'yes') {
-        return true; 
-    }
-    if (value === 'off' || value === 'no') {
-        return false; 
-    }
-    if(/^-?\d+$/.test(value)) {
-        const number = parseInt(value, 10);
-        if (!Number.isNaN(number)){
-            return number;
-        }
-    }
-    if(/^-?\d+\.\d+$/.test(value)) {
-        const number = parseFloat(value);
-        if (!Number.isNaN(number)){
-            return number;
-        }
-    }
-    if (value.indexOf('ERR:') !== -1) {
-        return null;
-    }
-    return str;
-}
