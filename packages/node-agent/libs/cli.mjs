@@ -30,7 +30,6 @@ commander.command('start <nodeName>')
                 fs: nodeFs,
             }
         };
-        console.log(config);
         commands.start(config);
     });
 

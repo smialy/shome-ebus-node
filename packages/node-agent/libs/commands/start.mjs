@@ -110,7 +110,7 @@ async function runCollectors(config, listener) {
 }
 
 function ebusCollector(config) {
-    const ebus = new EbusMetricReader(config.ebus);
+    const ebus = new EbusMetricReader(config);
     return async () => await ebus.read();
 }
 function systemCollector(config) {
