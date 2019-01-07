@@ -1,37 +1,45 @@
 import commander from 'commander';
 
 import pkg from '../package.json';
-// import * as ui from './ui';
-// import * as consts from './consts';
 import * as commands from './commands'
 import { setupExceptionHandler } from './utils/errors';
 
     
-commander.command('start')
+commander.command('start <nodeName>')
     .option('--host <host>', 'metric exporter host', 'localhost')
     .option('--port <port>', 'metric exporter port', 9091)
+    .option('--enable-ebus', 'enable ebus service', false)
     .option('--ebus-host <host>', 'ebus service host', 'localhost')
     .option('--ebus-port <port>', 'ebus service port', 8888)
+    .option('--node-fs <names>', 'node fs names', '*')
     
-    // .option('--wamp-url <url>', 'wamp server url', 'ws://localhost:8080/ws')
-    // .option('--wamp-realm <realm>', 'wamp server realm', 'shome')
-    .action(options => {
-        const { ebusPort, ebusHost, host, port } = options;
-        commands.start({
+    .action((name, options) => {
+        const nodeFs = options.nodeFs === '*' ? '*' : options.nodeFs.split(',');
+        const config = {
+            name,
             server: {
-                host,
-                port,
+                host: options.host,
+                port: options.port,
             },
             ebus: {
-                host: ebusHost,
-                port: ebusPort,
+                enabled: !!options.enableEbus,
+                host: options.ebusHost,
+                port: options.ebusPort,
+            },
+            node: {
+                fs: nodeFs,
             }
-        });
+        };
+        console.log(config);
+        commands.start(config);
     });
 
 commander.version(pkg.version)
     .usage('[cmd]');
 
+async function readConfigFile(configFile) {
+
+}
 
 (function run(){
     setupExceptionHandler();

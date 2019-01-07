@@ -13,6 +13,6 @@ module.exports = {
     output: {
         file: 'dist/cli.js',
         format: 'cjs',
-        name: 'ebus-agent',
+        name: 'node-agent',
     },
 };
