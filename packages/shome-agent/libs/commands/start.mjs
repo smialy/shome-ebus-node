@@ -101,7 +101,6 @@ function createMetricCollector(config) {
         const collectors = [systemInfoReader(config)];
         if (ebusEnabled){
             const now = getTime();
-            console.log(now - idle , ebusInterval)
             if(now - idle >= ebusInterval) {
                 collectors.push(ebus.read());
                 idle = now;

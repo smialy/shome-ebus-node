@@ -15,7 +15,6 @@ commander.command('start <nodeName>')
     .option('--ebus-interval <second>', 'ebus read interval', 60)
     .action((name, options) => {
         const nodeFs = options.nodeFs === '*' ? '*' : options.nodeFs.split(',');
-        console.log(options)
         const config = {
             name,
             server: {
