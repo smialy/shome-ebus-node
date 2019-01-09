@@ -8,13 +8,14 @@ import { setupExceptionHandler } from './utils/errors';
 commander.command('start <nodeName>')
     .option('--host <host>', 'metric exporter host', 'localhost')
     .option('--port <port>', 'metric exporter port', 9091)
+    .option('--node-fs <names>', 'node fs names', '*')
     .option('--enable-ebus', 'enable ebus service', false)
     .option('--ebus-host <host>', 'ebus service host', 'localhost')
     .option('--ebus-port <port>', 'ebus service port', 8888)
-    .option('--node-fs <names>', 'node fs names', '*')
-    
+    .option('--ebus-interval <second>', 'ebus read interval', 60)
     .action((name, options) => {
         const nodeFs = options.nodeFs === '*' ? '*' : options.nodeFs.split(',');
+        console.log(options)
         const config = {
             name,
             server: {
@@ -25,6 +26,7 @@ commander.command('start <nodeName>')
                 enabled: !!options.enableEbus,
                 host: options.ebusHost,
                 port: options.ebusPort,
+                interval: options.ebusInterval,
             },
             node: {
                 fs: nodeFs,

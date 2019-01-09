@@ -1,6 +1,6 @@
 import koa from 'koa';
 import Router from 'koa-router';
-import koaBody from 'koa-body';
+// import koaBody from 'koa-body';
 
 
 import EbusMetricReader from '../ebus/reader'; 
@@ -9,20 +9,18 @@ import systemInfoReader from '../info';
 
 
 export async function start(config) {
-    let metrics = {};
-
-    runCollectors(config, items => {
-        Object.assign(metrics, groupByName(items));
-    });
+    const collectMetrics = createMetricCollector(config);
     const app = new koa();
     let api = new Router({
         prefix: '/api'
     });
-    api.get('/metrics', ctx => {
+
+    api.get('/metrics', async ctx => {
         const labels = { node: config.name };
+        const metrics = await collectMetrics();
         ctx.body = toPrometheusMetrics(metrics, labels);
     });
-    
+
     // api.post('/fluentbit', koaBody(), async ctx => {
     //     const type = ctx.request.get('fluent-tag');
     //     if (type) {
@@ -56,8 +54,9 @@ function preapreLabels(...args) {
 }
 
 function toPrometheusMetrics(metrics, labels={}) {
+    const groups = groupByName(metrics);
     const buff = [];
-    for (const [name, meta] of Object.entries(metrics)) {
+    for (const [name, meta] of Object.entries(groups)) {
         if (meta.description) {
             buff.push(`# HELP ${name} ${meta.description}`)
         }
@@ -66,12 +65,11 @@ function toPrometheusMetrics(metrics, labels={}) {
         }
         for( const metric of meta.items) {
             const textLabels = preapreLabels(labels, metric.labels);
-            buff.push(`${name}${textLabels} ${metric.value} ${metric.time}`);
+            buff.push(`${name}${textLabels} ${metric.value}`);
         }
     }
     return buff.join('\n');
 }
-
 
 function groupByName(metrics) {
     const buff = {};
@@ -93,26 +91,23 @@ function groupByName(metrics) {
     return buff;
 }
 
-
-async function runCollectors(config, listener) {
-    const collectors = [
-        systemCollector(config),
-    ];
-    if (config.ebus.enabled) {
-        collectors.push(ebusCollector(config.ebus));
-    }
-    (async function run() {
-        for(const collector of collectors) {
-            listener(await collector());
+function createMetricCollector(config) {
+    const getTime = () => new Date().getTime();    
+    const ebus = new EbusMetricReader(config.ebus);
+    const ebusEnabled = config.ebus.enabled;
+    const ebusInterval = config.ebus.interval * 1000;
+    let idle = getTime() - ebusInterval;
+    return async () => {
+        const collectors = [systemInfoReader(config)];
+        if (ebusEnabled){
+            const now = getTime();
+            console.log(now - idle , ebusInterval)
+            if(now - idle >= ebusInterval) {
+                collectors.push(ebus.read());
+                idle = now;
+            }
         }
-        setTimeout(run, 60 * 1000);
-    })();
-}
-
-function ebusCollector(config) {
-    const ebus = new EbusMetricReader(config);
-    return async () => await ebus.read();
-}
-function systemCollector(config) {
-    return async () => await systemInfoReader(config);
+        const metrics = await Promise.all(collectors);
+        return metrics.reduce((prev, curr) => prev.concat(curr), []);
+    };
 }
