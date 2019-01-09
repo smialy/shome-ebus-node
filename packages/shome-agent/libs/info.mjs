@@ -9,20 +9,22 @@ export default async function toMetric(config) {
         currentLoadData,
         fsData,
         fsStats,
-        tempData
+        tempData,
+        networkStats,
     ] = await Promise.all([
         si.mem(),
         si.currentLoad(),
         si.fsSize(),
         si.fsStats(),
         si.cpuTemperature(),
+        networkInfo(),
     ]);
-    // console.log(fsData)
     const data = [
         addMemoryInfo(memData),
         addLoadInfo(currentLoadData),
         addFs(fsData, fsStats, config.node.fs),
         addCpuTemp(tempData),
+        addNetwork(networkStats),
     ];
     let buff = [];
     for (const item of data) {
@@ -81,6 +83,25 @@ function addFs(sizes, stats, names='*') {
         ]).concat(statsMetrics);
     
     return flatArray(sizesMetrics); 
+}
+
+async function networkInfo() {
+    const stats = await si.networkInterfaces();
+    const loaders = stats
+        .map(stat => stat.iface)
+        .filter(iface => iface !== 'lo')
+        .map(async iface => await si.networkStats(iface))
+    return await Promise.all(loaders);
+}
+
+function addNetwork(stats) {
+    return flatArray(stats
+        .filter(stat => stat.rx_sec !== -1)
+        .map(stat => [
+            add('node_network_rx', stat.rx_sec, '', TYPE_GAUGE, {name: stat.iface, state: stat.operstate}),
+            add('node_network_tx', stat.tx_sec, '', TYPE_GAUGE, {name: stat.iface, state: stat.operstate}),
+        ])
+    );
 }
 
 function add(name, value, description, type=TYPE_GAUGE, labels={}) {

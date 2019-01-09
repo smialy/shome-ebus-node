@@ -75,6 +75,9 @@ function groupByName(metrics) {
     const buff = {};
     
     for(const metric of metrics) {
+        if (!metric) {
+            continue;
+        }
         if (!buff[metric.name]) {
             buff[metric.name] = {
                 items: [],
