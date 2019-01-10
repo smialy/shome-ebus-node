@@ -11,6 +11,7 @@ export default async function toMetric(config) {
         fsStats,
         tempData,
         networkStats,
+        dockerStats,
     ] = await Promise.all([
         si.mem(),
         si.currentLoad(),
@@ -51,8 +52,6 @@ function addLoadInfo(data) {
         add('node_cpu_load_user', data.currentload_user),
         add('node_cpu_load_system', data.currentload_system),
         add('node_cpu_load_average', data.avgload),
-        
-        
     ];
 }
 

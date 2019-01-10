@@ -19,7 +19,9 @@ export async function start(config) {
         const labels = { node: config.name };
         const metrics = await collectMetrics();
         ctx.body = toPrometheusMetrics(metrics, labels);
+        
     });
+
 
     // api.post('/fluentbit', koaBody(), async ctx => {
     //     const type = ctx.request.get('fluent-tag');
@@ -95,21 +97,12 @@ function groupByName(metrics) {
 }
 
 function createMetricCollector(config) {
-    const getTime = () => new Date().getTime();    
     const ebus = new EbusMetricReader(config.ebus);
-    const ebusEnabled = config.ebus.enabled;
-    const ebusInterval = config.ebus.interval * 1000;
-    let idle = getTime() - ebusInterval;
     return async () => {
-        const collectors = [systemInfoReader(config)];
-        if (ebusEnabled){
-            const now = getTime();
-            if(now - idle >= ebusInterval) {
-                collectors.push(ebus.read());
-                idle = now;
-            }
-        }
-        const metrics = await Promise.all(collectors);
+        const metrics = await Promise.all([
+            systemInfoReader(config),
+            ebus.read(),
+        ]);
         return metrics.reduce((prev, curr) => prev.concat(curr), []);
     };
 }
