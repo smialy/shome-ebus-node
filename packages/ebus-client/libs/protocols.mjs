@@ -15,7 +15,8 @@ export class TelnetProtocol {
         this._queue = [];
         this._buff = []
     }
-    send(message) {
+    send(...args) {
+        const message = args.join(' ').trim(); 
         const defeder = createDefeder();
         this._queue.push({
             defeder,
@@ -57,8 +58,9 @@ export class TelnetProtocol {
 }
 
 export class EBusProtocol extends TelnetProtocol {
-    async find(device) {
-        return await this.send(`find -c ${device}`);
+    async find(device='') {
+        const circut = device ? `-c ${device}` : '';
+        return await this.send('find', circut);
     }
     async read(name, device) {
         const value = await this.send(`read -f -c ${device} ${name}`);

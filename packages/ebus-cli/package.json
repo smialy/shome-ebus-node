@@ -1,8 +1,14 @@
 {
-  "name": "@shome/agent",
+  "name": "@shome/ebus-cli",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/cli.js",
+  "bin": {
+    "shome-ebus": "./bin/shome-ebus"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
   "scripts": {
     "build": "rollup -c",
     "prepare": "npm run build",
@@ -14,19 +20,13 @@
   ],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "@shome/ebus-client": "0.0.1",
-    "commander": "^2.19.0",
-    "koa": "^2.6.2",
-    "koa-body": "^4.0.6",
-    "koa-router": "^7.4.0",
-    "msgpack5": "^4.2.1",
-    "node-cron": "^2.0.3",
-    "systeminformation": "^3.54.0"
-  },
   "devDependencies": {
     "rollup": "^1.0.1",
     "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^4.0.0"
+  },
+  "dependencies": {
+    "@shome/ebus-client": "0.0.1",
+    "commander": "^2.19.0"
   }
 }

@@ -4,7 +4,7 @@ import pkg from '../package.json';
 import * as commands from './commands'
 import { setupExceptionHandler } from './utils/errors';
 
-    
+
 commander.command('start <nodeName>')
     .option('--host <host>', 'metric exporter host', 'localhost')
     .option('--port <port>', 'metric exporter port', 9091)

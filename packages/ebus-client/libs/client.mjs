@@ -37,7 +37,10 @@ export default class EBusClient {
         }
         this._transport = transport;
         this._protocol = protocol;
-        
+    }
+    async find(device='') {
+        await this.connect();
+        return await this._protocol.find(device);
     }
     async read(name, device) {
         await this.connect();
@@ -45,40 +48,28 @@ export default class EBusClient {
     }
     async readMany(names, device) {
         await this.connect();
-        const promises = names.map(name => this._protocol.read(name, device));
-        const values = await Promise.all(promises);
-        const results = {};
-        for (let i = 0; i < names.length; i += 1) {
-            results[names[i]] = values[i];
+        for (const name of names) {
+            results[name] = await this._protocol.read(name, device);
         }
         return results;
     }
-    async readAll(device) {
+    async * readAll(device) {
         await this.connect();
         const data = await this._protocol.find(device);
         const lines = data.split('\n');
-        const names = [];
-        const promises = [];
+        const values = {};
         for (const line of lines) {
             if (line.length && line.indexOf(device) !== -1) {
                 const parts = line.split(' = ');
                 if (parts.length == 2) {
                     const name = parts[0].substr(device.length + 1);
                     if (parts[0].indexOf(device) === 0) {
-                        names.push(name);
-                        promises.push(this.read(name, device));    
+                        yield [name, await this.read(name, device)];
                     }
                 }
-            }            
-        }
-        const results = {};
-        if (names) {
-            const values = await Promise.all(promises);
-            for (let i = 0; i < names.length; i += 1) {
-                results[names[i]] = values[i];
             }
         }
-        return results;
+        return values;
     }
     close() {
         if (this._connected) {
