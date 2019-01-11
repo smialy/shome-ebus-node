@@ -1,11 +1,10 @@
 # @shome/ebus-cli
 
-    Command Line Utility for [ebusd](https://github.com/john30/ebusd) 
+Command Line Utility for [ebusd](https://github.com/john30/ebusd) 
 
 ## Installation
 
     $ npm install @shome/ebus-cli --save
-
 
 ## Usage
     
@@ -16,7 +15,6 @@ Read all registers from device: "bai" (Vaillant)
 ## Flags
 
     $ shome-ebus --help
-
 
 ## License
 
