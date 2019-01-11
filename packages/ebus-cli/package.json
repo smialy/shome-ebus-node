@@ -26,7 +26,7 @@
     "rollup-plugin-node-resolve": "^4.0.0"
   },
   "dependencies": {
-    "@shome/ebus-client": "0.0.1",
+    "@shome/ebus-client": "^0.0.1",
     "commander": "^2.19.0"
   }
 }

@@ -15,7 +15,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@shome/ebus-client": "0.0.1",
+    "@shome/ebus-client": "^0.0.1",
     "commander": "^2.19.0",
     "koa": "^2.6.2",
     "koa-body": "^4.0.6",
