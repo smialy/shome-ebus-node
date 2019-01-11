@@ -2,10 +2,7 @@ import { createConnection } from './sockets';
 import { EBusProtocol } from './protocols';
 
 
-
-function wait(timeout) {
-    return new Promise((resolve => setTimeout(resolve, timeout)))
-}
+const wait = timeout => new Promise(resolve => setTimeout(resolve, timeout));
 
 export default class EBusClient {
     constructor(options) {
@@ -46,11 +43,11 @@ export default class EBusClient {
         await this.connect();
         return await this._protocol.read(name, device);
     }
-    async readMany(names, device) {
+    async * readMany(names, device) {
         await this.connect();
         const results = {};
         for (const name of names) {
-            results[name] = await this._protocol.read(name, device);
+            yield [name, await this._protocol.read(name, device)];
         }
         return results;
     }

@@ -62,7 +62,7 @@ export class EBusProtocol extends TelnetProtocol {
         const circut = device ? `-c ${device}` : '';
         return await this.send('find', circut);
     }
-    async read(name, device) {
+    async read(name, device='') {
         const value = await this.send(`read -f -c ${device} ${name}`);
         return parseValue(value.trim());
     }
