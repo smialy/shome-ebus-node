@@ -22,7 +22,6 @@ export async function start(config) {
         
     });
 
-
     // api.post('/fluentbit', koaBody(), async ctx => {
     //     const type = ctx.request.get('fluent-tag');
     //     if (type) {

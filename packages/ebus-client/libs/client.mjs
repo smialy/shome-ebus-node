@@ -48,6 +48,7 @@ export default class EBusClient {
     }
     async readMany(names, device) {
         await this.connect();
+        const results = {};
         for (const name of names) {
             results[name] = await this._protocol.read(name, device);
         }
