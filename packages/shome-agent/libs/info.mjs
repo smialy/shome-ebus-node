@@ -5,6 +5,7 @@ const TYPE_GAUGE = 'gauge';
 
 export default async function toMetric(config) {
     const [
+        timeData,
         memData,
         currentLoadData,
         fsData,
@@ -13,6 +14,7 @@ export default async function toMetric(config) {
         networkStats,
         dockerStats,
     ] = await Promise.all([
+        si.time(),
         si.mem(),
         si.currentLoad(),
         si.fsSize(),
@@ -21,6 +23,7 @@ export default async function toMetric(config) {
         networkInfo(),
     ]);
     const data = [
+        addTimeData(timeData),
         addMemoryInfo(memData),
         addLoadInfo(currentLoadData),
         addFs(fsData, fsStats, config.node.fs),
@@ -33,7 +36,12 @@ export default async function toMetric(config) {
     }
     return buff;
 }
-
+function addTimeData(data) {
+    return [
+        add('node_boot_time_seconds', data.uptime, 'Node boot time, in unixtime.'),
+        add('node_local_time', data.current, 'Node time', TYPE_COUNTER, {timezone: data.timezone, timezone_name: data.timezoneName}),
+    ];
+}
 function addMemoryInfo(data) {
     return [
         add('node_memory_total', data.total, 'Node memory total', TYPE_COUNTER),
