@@ -1,6 +1,6 @@
 {
   "name": "@shome/ebus-cli",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/cli.js",
   "bin": {
@@ -20,13 +20,13 @@
   ],
   "author": "",
   "license": "MIT",
+  "dependencies": {
+    "@shome/ebus-client": "^0.1.0",
+    "commander": "^2.19.0"
+  },
   "devDependencies": {
     "rollup": "^1.0.1",
     "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^4.0.0"
-  },
-  "dependencies": {
-    "@shome/ebus-client": "^0.0.1",
-    "commander": "^2.19.0"
   }
 }

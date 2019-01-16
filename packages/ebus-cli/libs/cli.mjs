@@ -10,6 +10,12 @@ commander.command('find [device]')
         await commands.find(device, options);
     });
 
+commander.command('read <device> <name>')
+.option('--host <host>', 'metric exporter host', 'localhost')
+.option('--port <port>', 'metric exporter port', 8888)
+.action(async (device, name, options) => {
+    await commands.read(device, name, options);
+});
 
 commander.command('read-all <device>')
     .option('--host <host>', 'metric exporter host', 'localhost')

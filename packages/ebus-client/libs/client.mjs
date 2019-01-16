@@ -39,15 +39,15 @@ export default class EBusClient {
         await this.connect();
         return await this._protocol.find(device);
     }
-    async read(name, device) {
+    async read(device, name) {
         await this.connect();
-        return await this._protocol.read(name, device);
+        return await this._protocol.read(device, name);
     }
-    async * readMany(names, device) {
+    async * readMany(device, names) {
         await this.connect();
         const results = {};
         for (const name of names) {
-            yield [name, await this._protocol.read(name, device)];
+            yield [name, await this._protocol.read(device, name)];
         }
         return results;
     }
@@ -62,7 +62,7 @@ export default class EBusClient {
                 if (parts.length == 2) {
                     const name = parts[0].substr(device.length + 1);
                     if (parts[0].indexOf(device) === 0) {
-                        yield [name, await this.read(name, device)];
+                        yield [name, await this.read(device, name)];
                     }
                 }
             }

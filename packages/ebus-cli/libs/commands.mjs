@@ -9,6 +9,14 @@ export async function find(device, options) {
     client.close();
 }
 
+export async function read(device, name, options) {
+    const { host, port } = options;
+    const client = new EbusClient({ host, port });
+    const result = await client.read(device, name);
+    console.log(result);
+    client.close();
+}
+
 export async function readAll(device, options) {
     const { host, port } = options;
     const client = new EbusClient({ host, port });

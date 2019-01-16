@@ -31,7 +31,7 @@ export default class MetricReader {
         const client = this.getClient();
         try {
             const buff = [];
-            const items = await client.readMany(ebusNames, VAILLANT_CODE);
+            const items = await client.readMany(VAILLANT_CODE, ebusNames);
             for(const [ename, evalue] of Object.entries(items)) {
                 const { name, description, type } = sensorsByEbusName[ename];
                 buff.push({
