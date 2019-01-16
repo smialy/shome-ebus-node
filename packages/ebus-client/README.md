@@ -14,7 +14,6 @@
 import EBusClient from '@shome/ebus-client';
 
 const client = new EBusClient({
-    enabled: true|false,
     host: <host>,
     port: <port>,
 });
