@@ -16,7 +16,8 @@ export default class MetricReader {
     constructor(config) {
         this.config = config;
         this._cache = [];
-        this._lastReadTime = getTime(); 
+        this._lastReadTime = 0;
+        this._loading = false;
     }
     async read() {
         if (!this.config.enabled) {
@@ -24,30 +25,34 @@ export default class MetricReader {
         }
         const interval = this.config.interval * 1000;
         const now = getTime();
-
-        if (now - this._lastReadTime < interval && this._cache.length) {
-            return this._cache;
-        }
-        const client = this.getClient();
-        try {
-            const buff = [];
-            const items = await client.readMany(VAILLANT_CODE, ebusNames);
-            for(const [ename, evalue] of Object.entries(items)) {
-                const { name, description, type } = sensorsByEbusName[ename];
-                buff.push({
-                    time: new Date().getTime(),
-                    name: `ebus_sensor_${name}`,
-                    value: convertValue(evalue),
-                    description,
-                    type,
-                });
-            }
+        console.log(now, interval, now - this._lastReadTime)
+        if (!this._loading && now - this._lastReadTime > interval) {
+            this._loading = true;
             this._lastReadTime = now;
-            this._cache = buff;
-            return buff;
-        } catch (e) {
-            console.warn(e);
+            setTimeout(async () => {
+                const client = this.getClient();
+                try {
+                    const buff = [];
+                    const items = await client.readMany(VAILLANT_CODE, ebusNames);
+                    for await (const [ename, evalue] of items) {
+                        const { name, description, type } = sensorsByEbusName[ename];
+                        buff.push({
+                            time: new Date().getTime(),
+                            name: `ebus_sensor_${name}`,
+                            value: convertValue(evalue),
+                            description,
+                            type,
+                        });
+                    }
+                    this._loading = false;
+                    this._cache = buff;
+                    return buff;
+                } catch (e) {
+                    console.warn(e);
+                }
+            });
         }
+        return this._cache;
     }
     getClient() {
         if (!this._client) {
