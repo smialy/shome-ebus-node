@@ -25,7 +25,6 @@ export default class MetricReader {
         }
         const interval = this.config.interval * 1000;
         const now = getTime();
-        console.log(now, interval, now - this._lastReadTime)
         if (!this._loading && now - this._lastReadTime > interval) {
             this._loading = true;
             this._lastReadTime = now;

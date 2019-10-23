@@ -28,7 +28,7 @@ export default async function toMetric(config) {
         addLoadInfo(currentLoadData),
         addFs(fsData, fsStats, config.node.fs),
         addCpuTemp(tempData),
-        addNetwork(networkStats),
+        //addNetwork(networkStats),
     ];
     let buff = [];
     for (const item of data) {
@@ -86,10 +86,10 @@ function addFs(sizes, stats, names='*') {
         .map(item => [
             add('node_fs_size_bytes', item.size, 'Size in bytes', TYPE_COUNTER, { name: item.fs, type: item.type, mount: item.mount}),
             add('node_fs_used_bytes', item.used, 'Used in bytes', TYPE_GAUGE, { name: item.fs, type: item.type, mount: item.mount}),
-            add('node_fs_used_percent', item.use, 'Used in percent', TYPE_GAUGE, { name: item.fs, type: item.type, mount: item.mount}), 
+            add('node_fs_used_percent', item.use, 'Used in percent', TYPE_GAUGE, { name: item.fs, type: item.type, mount: item.mount}),
         ]).concat(statsMetrics);
-    
-    return flatArray(sizesMetrics); 
+
+    return flatArray(sizesMetrics);
 }
 
 async function networkInfo() {
