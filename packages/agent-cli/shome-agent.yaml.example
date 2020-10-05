@@ -1,0 +1,37 @@
+general:
+  node_name: 'node-name'
+
+mqtt:
+  host: localhost
+  port: 1883
+  username: ebus
+  password:
+
+ebus:
+  host: localhost
+  port: 8888
+  interval: 50
+
+  devices:
+    -
+      circuit: bai
+      fields:
+        - Flame
+        - CirPump
+        - FlowTemp
+        - ReturnTemp
+        - WP
+        - OutdoorstempSensor
+        - StorageTemp
+        - WaterPressure
+        - PrEnergySumHc1
+        - PrEnergySumHwc1
+        - PositionValveSet
+        - ModulationTempDesired
+
+zigbee:
+
+
+exporter:
+  host: 0.0.0.0
+  port: 9091

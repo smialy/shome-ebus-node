@@ -1,12 +1,11 @@
 {
   "name": "@shome/agent-cli",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "libs/cli.mjs",
+  "type": "module",
   "scripts": {
-    "build": "rollup -c",
-    "prepare": "npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --write 'libs/**/*.mjs'"
   },
   "files": [
     "dist/",
@@ -17,16 +16,12 @@
   "dependencies": {
     "@shome/ebus-client": "^0.1.0",
     "commander": "^3.0.2",
+    "js-yaml": "^3.14.0",
     "koa": "^2.10.0",
-    "koa-body": "^4.1.1",
     "koa-router": "^7.4.0",
-    "msgpack5": "^4.2.1",
-    "node-cron": "^2.0.3",
-    "systeminformation": "^4.14.17"
-  },
-  "devDependencies": {
-    "rollup": "^1.25.2",
-    "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^5.2.0"
+    "mqtt": "^4.2.1"
+},
+"devDependencies": {
+    "prettier": "^2.1.2"
   }
 }
